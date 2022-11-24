@@ -1,3 +1,6 @@
 node_modules/
 dist/
 .husky/
+.env
+tmp/
+!tmp/.gitkeep

@@ -4,22 +4,31 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node dist/index.js",
     "build": "tsc",
-    "dev": "tsc -w",
+    "dev": "nodemon --watch dist src/index.ts",
     "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/follow-redirects": "^1.14.1",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "husky": "^8.0.2",
     "lint-staged": "^13.0.3",
     "prettier": "^2.8.0",
+    "ts-node": "^10.9.1",
     "typescript": "^4.9.3"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
+  },
+  "dependencies": {
+    "discord.js": "^14.6.0",
+    "dotenv": "^16.0.3",
+    "follow-redirects": "^1.15.2",
+    "simple-git": "^3.15.0"
   }
 }
