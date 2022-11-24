@@ -63,7 +63,6 @@ client.on("interactionCreate", async (interaction) => {
         logger.success("Done.");
         await interaction.followUp("ゾス");
       } catch (err) {
-        console.error(err);
         logger.failed(err);
         await interaction.followUp("😭内部エラーが発生したゾ😭");
       }

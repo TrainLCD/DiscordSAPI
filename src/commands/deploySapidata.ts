@@ -99,7 +99,6 @@ export const deploySapidataCmd = (logger: Logger) =>
           resolve();
         });
     } catch (err) {
-      console.error(err);
       reject(err);
     }
   });
