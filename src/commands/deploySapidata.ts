@@ -88,6 +88,7 @@ export const deploySapidataCmd = (logger: Logger) =>
       }
 
       // 変更がある場合のみpush&resolve
+      logger.debug("`attempting git push -u origin dev...");
       gitForPush
         .commit("Commited automatically")
         .push(["-u", "origin", "dev"], () => {
