@@ -1,5 +1,5 @@
 import { https } from "follow-redirects";
-import fs from "fs";
+import fs from "node:fs";
 import simpleGit from "simple-git";
 
 const {

@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+import chalk from "chalk";
 import {
   Client,
   GatewayIntentBits,
@@ -58,12 +59,27 @@ client.on("interactionCreate", async (interaction) => {
       try {
         await interaction.deferReply();
         await deploySapidataCmd();
+        console.log(
+          chalk.green("[SUCCEEDED]"),
+          interaction.member?.user.username,
+          new Date().getTime()
+        );
         await interaction.followUp("ゾス");
       } catch (err) {
         console.error(err);
+        console.log(
+          chalk.red("[FAILED]"),
+          interaction.member?.user.username,
+          new Date().getTime()
+        );
         await interaction.followUp("😭内部エラーが発生したゾ😭");
       }
     } else {
+      console.log(
+        chalk.yellow("[NOT GRANTED]"),
+        interaction.member?.user.username,
+        new Date().getTime()
+      );
       await interaction.reply("は？");
     }
   }
