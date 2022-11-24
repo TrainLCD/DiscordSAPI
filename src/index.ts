@@ -1,6 +1,5 @@
 require("dotenv").config();
 
-import chalk from "chalk";
 import {
   Client,
   GatewayIntentBits,
@@ -9,6 +8,7 @@ import {
   Routes,
 } from "discord.js";
 import { deploySapidataCmd } from "./commands/deploySapidata";
+import Logger from "./utils/logger";
 
 const { DISCORD_CLIENT_ID, DISCORD_BOT_TOKEN, DEPLOYABLE_ROLE_ID } =
   process.env;
@@ -51,6 +51,7 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === "deploy_sapidata") {
+    const logger = new Logger(interaction.member?.user.username);
     if (
       (interaction.member?.roles as GuildMemberRoleManager).cache.has(
         DEPLOYABLE_ROLE_ID
@@ -58,28 +59,16 @@ client.on("interactionCreate", async (interaction) => {
     ) {
       try {
         await interaction.deferReply();
-        await deploySapidataCmd();
-        console.log(
-          chalk.green("[SUCCEEDED]"),
-          interaction.member?.user.username,
-          new Date().getTime()
-        );
+        await deploySapidataCmd(logger);
+        logger.success("Done.");
         await interaction.followUp("ゾス");
       } catch (err) {
         console.error(err);
-        console.log(
-          chalk.red("[FAILED]"),
-          interaction.member?.user.username,
-          new Date().getTime()
-        );
+        logger.failed(err);
         await interaction.followUp("😭内部エラーが発生したゾ😭");
       }
     } else {
-      console.log(
-        chalk.yellow("[NOT GRANTED]"),
-        interaction.member?.user.username,
-        new Date().getTime()
-      );
+      logger.denied();
       await interaction.reply("は？");
     }
   }

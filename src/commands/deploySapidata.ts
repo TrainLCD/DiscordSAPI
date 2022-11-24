@@ -1,6 +1,7 @@
 import { https } from "follow-redirects";
 import fs from "node:fs";
 import simpleGit from "simple-git";
+import { default as Logger } from "../utils/logger";
 
 const {
   EXPORTABLE_SPREADSHEET_BASE_URL,
@@ -40,12 +41,14 @@ const downloadCSV = (uri: string, filename: string) =>
     )
   );
 
-const updateMigrationCSV = () =>
+export const deploySapidataCmd = (logger: Logger) =>
   new Promise<void>(async (resolve, reject) => {
     try {
       // ファイルが存在するとクローン時エラーになってしまうのでディレクトリがあったら消す
       if (fs.existsSync(CLONED_DIR)) {
+        logger.debug(`${CLONED_DIR} exists.`);
         fs.rmSync(CLONED_DIR, { recursive: true, force: true });
+        logger.debug(`${CLONED_DIR} has been deleted.`);
       }
 
       // StationAPIリポジトリをcloneする
@@ -56,11 +59,14 @@ const updateMigrationCSV = () =>
         trimmed: false,
       }).clone("git@github.com:TrainLCD/StationAPI.git");
 
+      logger.debug(`The repository has been cloned into ${CLONE_BASE_DIR}.`);
+
       // CSVファイルをスプシからダウンロード
       await Promise.all(
         EXPORTABLE_SPREADSHEET_URLS.map(async (url, idx) => {
           const outputPath = `${CLONED_DIR}/migrations/${EXPORTABLE_SPREADSHEET_FILE_NAMES[idx]}`;
-          return downloadCSV(url, outputPath);
+          await downloadCSV(url, outputPath);
+          logger.debug(`${outputPath} downloaded.`);
         })
       );
 
@@ -72,27 +78,27 @@ const updateMigrationCSV = () =>
         trimmed: false,
       });
       gitForPush.add("./*");
+      logger.debug("Few changes has been staged.");
 
       // 差分が1行もないときは何もしないでresolve
       const diff = await gitForPush.diff();
       if (!diff.length) {
+        logger.success("No differences.");
         return resolve();
       }
 
       // 変更がある場合のみpush&resolve
       gitForPush
         .commit("Commited automatically")
-        .push(["origin", "dev"], () => resolve());
-
-      // 後片付け(不要となったファイルの削除)
-      fs.rmSync(CLONED_DIR, { recursive: true, force: true });
+        .push(["origin", "dev"], () => {
+          logger.debug("`git push` successfully completed.");
+          // 後片付け(不要となったファイルの削除)
+          fs.rmSync(CLONED_DIR, { recursive: true, force: true });
+          logger.debug(`${CLONED_DIR} has been deleted.`);
+          resolve();
+        });
     } catch (err) {
       console.error(err);
       reject(err);
     }
   });
-
-export const deploySapidataCmd = async () => {
-  // CSVをダウンロードして古いデータを置換する
-  await updateMigrationCSV();
-};
