@@ -88,11 +88,11 @@ export const deploySapidataCmd = (logger: Logger) =>
       }
 
       // 変更がある場合のみpush&resolve
-      logger.debug("`attempting git push -u origin dev...");
+      logger.debug("attempting git push -u origin dev...");
       gitForPush
         .commit("Commited automatically")
         .push(["-u", "origin", "dev"], () => {
-          logger.debug("`git push` successfully completed.");
+          logger.debug("git push` successfully completed.");
           // 後片付け(不要となったファイルの削除)
           fs.rmSync(CLONED_DIR, { recursive: true, force: true });
           logger.debug(`${CLONED_DIR} has been deleted.`);
