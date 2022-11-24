@@ -14,24 +14,24 @@ export default class Logger {
     console.log(
       chalk.green("[SUCCESS]"),
       ...data,
-      dayjs().format(LOG_DATE_FORMAT)
+      chalk.gray(dayjs().format(LOG_DATE_FORMAT))
     );
   failed = (...data: any[]) =>
     console.log(
       chalk.red("[FAILED]"),
       ...data,
-      dayjs().format(LOG_DATE_FORMAT)
+      chalk.gray(dayjs().format(LOG_DATE_FORMAT))
     );
   denied = (...data: any[]) =>
     console.log(
       chalk.yellow("[DENIED]"),
       ...data,
-      dayjs().format(LOG_DATE_FORMAT)
+      chalk.gray(dayjs().format(LOG_DATE_FORMAT))
     );
   debug = (...data: any[]) =>
     console.log(
       chalk.blue("[DEBUG]"),
       ...data,
-      dayjs().format(LOG_DATE_FORMAT)
+      chalk.gray(dayjs().format(LOG_DATE_FORMAT))
     );
 }
