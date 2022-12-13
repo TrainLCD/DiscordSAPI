@@ -78,7 +78,7 @@ export const deploySapidataCmd = (logger: Logger) =>
         trimmed: false,
       });
       gitForPush.add("./*");
-      logger.debug("Few changes has been staged.");
+      logger.debug("Changes are staged.");
 
       // 差分が1行もないときは何もしないでresolve
       const diff = await gitForPush.diff();
