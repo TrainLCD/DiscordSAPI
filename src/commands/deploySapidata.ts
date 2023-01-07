@@ -1,6 +1,6 @@
 import { https } from "follow-redirects";
 import fs from "node:fs";
-import simpleGit from "simple-git";
+import { execAsync } from "../utils/execAsync";
 import { default as Logger } from "../utils/logger";
 
 const {
@@ -51,13 +51,9 @@ export const deploySapidataCmd = (logger: Logger) =>
         logger.debug(`${CLONED_DIR} has been deleted.`);
       }
 
-      // StationAPIリポジトリをcloneする
-      await simpleGit({
-        baseDir: CLONE_BASE_DIR,
-        binary: "git",
-        maxConcurrentProcesses: 6,
-        trimmed: false,
-      }).clone("git@github.com:TrainLCD/StationAPI.git");
+      await execAsync(
+        `cd ${CLONE_BASE_DIR} && git clone git@github.com:TrainLCD/StationAPI.git`
+      );
 
       logger.debug(`The repository has been cloned into ${CLONE_BASE_DIR}.`);
 
@@ -70,34 +66,28 @@ export const deploySapidataCmd = (logger: Logger) =>
         })
       );
 
-      // push専用Gitオブジェクト
-      const gitForPush = simpleGit({
-        baseDir: CLONED_DIR,
-        binary: "git",
-        maxConcurrentProcesses: 6,
-        trimmed: false,
-      });
-      gitForPush.add("./*");
-      logger.debug("Changes are staged.");
-
       // 差分が1行もないときは何もしないでresolve
-      const diff = await gitForPush.diff();
+      const diff = await execAsync(`cd ${CLONED_DIR} && git diff`);
+
       if (!diff.length) {
         logger.success("No differences.");
         return resolve();
       }
 
+      await execAsync(`cd ${CLONED_DIR} && git add .`);
+      logger.debug("Changes are staged.");
+
       // 変更がある場合のみpush&resolve
+      await execAsync(
+        `cd ${CLONED_DIR} && git commit -m "Commited automatically"`
+      );
       logger.debug("attempting git push -u origin dev...");
-      gitForPush
-        .commit("Commited automatically")
-        .push(["-u", "origin", "dev"], () => {
-          logger.debug("git push` successfully completed.");
-          // 後片付け(不要となったファイルの削除)
-          fs.rmSync(CLONED_DIR, { recursive: true, force: true });
-          logger.debug(`${CLONED_DIR} has been deleted.`);
-          resolve();
-        });
+      await execAsync(`cd ${CLONED_DIR} && git push -u origin dev`);
+      logger.debug("git push` successfully completed.");
+      // 後片付け(不要となったファイルの削除)
+      fs.rmSync(CLONED_DIR, { recursive: true, force: true });
+      logger.debug(`${CLONED_DIR} has been deleted.`);
+      resolve();
     } catch (err) {
       reject(err);
     }

@@ -30,7 +30,6 @@
     "dayjs": "^1.11.6",
     "discord.js": "^14.6.0",
     "dotenv": "^16.0.3",
-    "follow-redirects": "^1.15.2",
-    "simple-git": "^3.15.0"
+    "follow-redirects": "^1.15.2"
   }
 }
