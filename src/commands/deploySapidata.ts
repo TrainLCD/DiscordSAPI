@@ -67,7 +67,7 @@ export const deploySapidataCmd = (logger: Logger) =>
       );
 
       // 差分が1行もないときは何もしないでresolve
-      const diff = await execAsync(`cd ${CLONED_DIR} && git diff`);
+      const diff = await execAsync(`cd ${CLONED_DIR} && git diff --stat`);
 
       if (!diff.length) {
         logger.success("No differences.");

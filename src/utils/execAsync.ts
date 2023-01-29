@@ -4,7 +4,7 @@ export const execAsync = (command: string) =>
   new Promise<string>((resolve, reject) => {
     exec(command, (err, stdout, stderr) => {
       if (err) {
-        reject(stderr);
+        reject(err);
         return;
       }
       resolve(stdout);
