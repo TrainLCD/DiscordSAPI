@@ -41,7 +41,10 @@ const downloadCSV = (uri: string, filename: string) =>
     )
   );
 
-export const deploySapidataCmd = (logger: Logger) =>
+export const deploySapidataCmd = (
+  logger: Logger,
+  commitMessage: string | undefined
+) =>
   new Promise<void>(async (resolve, reject) => {
     try {
       // ファイルが存在するとクローン時エラーになってしまうのでディレクトリがあったら消す
@@ -78,8 +81,17 @@ export const deploySapidataCmd = (logger: Logger) =>
       logger.debug("Changes are staged.");
 
       // 変更がある場合のみpush&resolve
+      logger.debug(
+        `${
+          commitMessage
+            ? `Commit message provided by user: ${commitMessage}`
+            : "Commit message is not provided."
+        }`
+      );
       await execAsync(
-        `cd ${CLONED_DIR} && git commit -m "Commited automatically"`
+        `cd ${CLONED_DIR} && git commit -m "${
+          commitMessage ?? "Commited automatically"
+        }"`
       );
       logger.debug("attempting git push -u origin dev...");
       await execAsync(`cd ${CLONED_DIR} && git push -u origin dev`);

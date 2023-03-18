@@ -22,6 +22,14 @@ const commands = [
     name: "deploy_sapidata",
     description:
       "現在のsapi-dataスプレッドシートからStationAPI(stg)のデプロイを作成します",
+    options: [
+      {
+        type: 3,
+        name: "commit_message",
+        description: "コミットメッセージ",
+        required: false,
+      },
+    ],
   },
 ];
 
@@ -58,8 +66,9 @@ client.on("interactionCreate", async (interaction) => {
       )
     ) {
       try {
-        await interaction.deferReply();
-        await deploySapidataCmd(logger);
+        await interaction.deferReply({ ephemeral: true });
+        const commitMessage = interaction.options.get("commit_message")?.value;
+        await deploySapidataCmd(logger, commitMessage as string | undefined);
         logger.success("Done.");
         await interaction.followUp("ゾス");
       } catch (err) {
